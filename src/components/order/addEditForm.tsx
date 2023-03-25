@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectAllWarehouses, selectCurrentOrder } from "@/redux/selector/order";
-import { EditOutlined } from "@mui/icons-material";
+import { Add, EditOutlined } from "@mui/icons-material";
 import { Button, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Col, Form, Row } from "react-bootstrap";
@@ -60,13 +60,13 @@ export default function AddEditOrder(props: any) {
       setSentAt(parseDate(currentOrder?.sent_at));
       setRecievedAt(parseDate(currentOrder?.recieved_at));
 
-      if(!currentOrderBelongsToUser(currentOrder, userId)) {
+      if (!currentOrderBelongsToUser(currentOrder, userId)) {
         setAllowEdit(false)
       }
     } else {
       setStockInOut(orderTransferTypeOptions[0].value);
       setOrderType(OrderTypeOptions[0].value);
-      setPaymentMode(orderPaymentModeOptions[0].value);
+      // setPaymentMode(orderPaymentModeOptions[0].value);
     }
   }, [currentOrder]);
 
@@ -78,7 +78,7 @@ export default function AddEditOrder(props: any) {
 
   function getOptions(options: Array<Options>) {
     return options.map((opt, index) => (
-      <option key={index} value={opt.value}>{opt.label}</option>
+      <option key={index + 1} value={opt.value}>{opt.label}</option>
     ));
   }
 
@@ -153,29 +153,6 @@ export default function AddEditOrder(props: any) {
     }
   }
 
-  // function handleInputSelectChange(event: any) {
-  //   const id = event.target.id;
-  //   const value = event.value;
-
-  //   switch (id) {
-  //     case "orderStatus":
-  //       setOrderStatus(value);
-  //       break;
-
-  //     case "stockInOut":
-  //       setStockInOut(value);
-  //       break;
-
-  //     case "orderType":
-  //       setOrderType(value);
-  //       break;
-
-  //     case "paymentMode":
-  //       setOrderType(value);
-  //       break;
-  //   }
-  // }
-
   function changeAllowEdit(e: any) {
     setAllowEdit(!allowEdit);
   }
@@ -197,39 +174,65 @@ export default function AddEditOrder(props: any) {
       delievery_challan_number: delieveryChallanNumber
     };
 
-    console.log(orderData)
     if (formType === "add") {
       dispatch(createOrder(orderData));
       router.back();
     } else {
       orderData.status = orderStatus;
-      dispatch(updateOrder(currentOrder?.id ,orderData));
+      dispatch(updateOrder(currentOrder?.id, orderData));
     }
   }
 
   function getLabel() {
-    if(orderId) {
+    if (orderId) {
       return `Order: #${orderId}`;
     }
 
     return `New Order`;
   }
 
+  function allowReturnOrder(): boolean {
+    if(orderId && !currentOrder?.child_order && (orderStatus === "recieved" || orderStatus === "sent") && (orderType === "installation" || orderType === "distribution_sale" || orderType === "amc")) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function createReturnOrder(e:  React.FormEvent) {
+    e.preventDefault();
+
+    if(!orderId) return;
+
+    const orderData: OrderCreateBody = {
+      parent_order_id: orderId,
+      order_type: "return"
+    };
+
+    dispatch(createOrder(orderData));
+    router.back();
+  }
+
   return (
     <>
       <Form className={'mt-5'} onSubmit={handleFormSubmit}>
         <Row>
-          <Col md={11} sm={11} xs={8}>
+          <Col md={8} sm={9} xs={4}>
             <Chip label={getLabel()} variant="outlined" className={styles.mRight} size={"medium"} />
-            {/* <Button variant="outlined" startIcon={<EditOutlined />} onClick={changeAllowEdit}>
-              Edit
-            </Button> */}
           </Col>
+          {
+            allowReturnOrder() &&
+            <Col md={3} sm={2} xs={4}>
+              <Button onClick={createReturnOrder} startIcon={<Add />} variant="contained" color="primary" type="submit">
+                Return Order
+              </Button>
+            </Col>            
+          }
           <Col md={1} sm={1} xs={4}>
             {
               allowEdit && (
                 <Button variant="contained" color="success" type="submit">
-                  { formType === "add" ? 'Create' : 'Update'}
+                  {formType === "add" ? 'Create' : 'Update'}
                 </Button>
               )
             }
@@ -245,7 +248,7 @@ export default function AddEditOrder(props: any) {
                 id={"orderType"}
                 value={orderType}
                 onChange={handleInputChange}
-                disabled={!allowEdit}
+                disabled={!allowEdit || (formType === "edit")}
               >
                 {getOptions(OrderTypeOptions)}
               </Form.Select>
@@ -253,7 +256,7 @@ export default function AddEditOrder(props: any) {
           </Col>
 
           <Col md={3}>
-            <Form.Group controlId="orderStockInOut">
+            <Form.Group controlId="stockInOut">
               <Form.Label>
                 Stock In/Out
               </Form.Label>
@@ -273,9 +276,9 @@ export default function AddEditOrder(props: any) {
               <Form.Label>
                 Order Status
               </Form.Label>
-              <Form.Select 
-                onChange={handleInputChange} 
-                disabled={!allowEdit || formType === "add"} 
+              <Form.Select
+                onChange={handleInputChange}
+                disabled={!allowEdit || formType === "add"}
                 value={orderStatus}
               >
                 {getOptions(orderStatusOptions)}
@@ -289,223 +292,234 @@ export default function AddEditOrder(props: any) {
                 Payment Mode
               </Form.Label>
               <Form.Select onChange={handleInputChange} disabled={!allowEdit} value={paymentMode}>
+                <option key={0} value={''}></option>
                 {getOptions(orderPaymentModeOptions)}
               </Form.Select>
             </Form.Group>
           </Col>
         </Row>
 
-        <Row className="mt-5">
-          {            
-            <Col md={3}>
-              <Form.Group controlId="sentFromUser">
-                <Form.Label>
-                  Sent From User(role)
-                </Form.Label>
-                {/* <Form.Control
-                  id={"sentFromUser"}
-                  value={sentFromUser}
-                  onChange={handleInputChange}
-                  disabled={true}
-                /> */}
-                <Form.Select id={"sentFromUser"} onChange={handleInputChange} disabled={!allowEdit} value={sentFromUser}>
-                  <option key={0} value={''}></option>
-                  {
-                    usersList.map((user: any, index: number) => (
-                      <option key={index+1} value={user?.id}>{`${user?.email} (${user?.user_type})`}</option>
-                    ))
-                  }
-                </Form.Select>
-              </Form.Group>
-            </Col>
+        <Row>
+          {
+            (orderType === "purchase" || orderType === "return") && (
+              <Col md={3} className="mt-5">
+                <Form.Group controlId="sentFromUser">
+                  <Form.Label>
+                    Sent From User(role)
+                  </Form.Label>
+                  <Form.Select 
+                    id={"sentFromUser"} 
+                    onChange={handleInputChange} 
+                    disabled={!allowEdit || (formType === "edit")} 
+                    value={sentFromUser}
+                  >
+                    <option key={0} value={''}></option>
+                    {
+                      usersList.map((user: any, index: number) => (
+                        <option key={index + 1} value={user?.id}>{`${user?.email} (${user?.user_type})`}</option>
+                      ))
+                    }
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            )
           }
 
-          <Col md={3}>
-            <Form.Group controlId="issuedFromWarehouse">
-              <Form.Label>
-                Issued From Warehouse
-              </Form.Label>
-              {/* <Form.Control
-                id={"issuedFromWarehouse"}
-                value={issuedFromWarehouse}
-                onChange={handleInputChange}
-                disabled={!allowEdit}
-              /> */}
-              <Form.Select id={"issuedFromWarehouse"} onChange={handleInputChange} disabled={!allowEdit} value={issuedFromWarehouse}>
-                <option key={0} value={''}></option>
-                {
-                  warehousesList.map((warehouse: any, index: number) => (
-                    <option key={index+1} value={warehouse?.id}>{warehouse?.name}</option>
-                  ))
-                }
-              </Form.Select>
-            </Form.Group>
-          </Col>
+          {
+            (orderType !== "purchase" && orderType !== "stock_transfer" && orderType !== "installation" && orderType !== "return") && (
+              <>
+                <Col md={3} className="mt-5">
+                  <Form.Group controlId="issuedFromWarehouse">
+                    <Form.Label>
+                      Issued From Warehouse
+                    </Form.Label>
+                    <Form.Select id={"issuedFromWarehouse"} onChange={handleInputChange} disabled={!allowEdit || formType === "edit"} value={issuedFromWarehouse}>
+                      <option key={0} value={''}></option>
+                      {
+                        warehousesList.map((warehouse: any, index: number) => (
+                          <option key={index + 1} value={warehouse?.id}>{warehouse?.name}</option>
+                        ))
+                      }
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </>
+            )
+          }
         </Row>
 
-        <Row className="mt-5">
-          <Col md={4}>
-            <Form.Group controlId="sentToUser">
-              <Form.Label>
-                Sent To User(role)
-              </Form.Label>
-              {/* <Form.Control
-                id={"sentToUser"}
-                value={sentToUser}
-                onChange={handleInputChange}
-                disabled={!allowEdit}
-              /> */}
-              <Form.Select id={"sentToUser"} onChange={handleInputChange} disabled={!allowEdit} value={sentToUser}>
-                <option key={0} value={''}></option>
-                {
-                  usersList.map((user: any, index: number) => (
-                    <option key={index+1} value={user?.id}>{`${user?.email} (${user?.user_type})`}</option>
-                  ))
-                }
-              </Form.Select>              
-            </Form.Group>
-          </Col>
+        <Row>
+          {
+            (orderType !== "purchase" && orderType !== "stock_transfer") && (
+              <Col md={4} className="mt-5">
+                <Form.Group controlId="sentToUser">
+                  <Form.Label>
+                    Sent To User(role)
+                  </Form.Label>
+                  <Form.Select id={"sentToUser"} onChange={handleInputChange} disabled={!allowEdit || formType === "edit"} value={sentToUser}>
+                    <option key={0} value={''}></option>
+                    {
+                      usersList.map((user: any, index: number) => (
+                        <option key={index + 1} value={user?.id}>{`${user?.email} (${user?.user_type})`}</option>
+                      ))
+                    }
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            )
+          }
 
-          <Col md={4}>
-            <Form.Group controlId="issuedToWarehouse">
-              <Form.Label>
-                Issued To Warehouse
-              </Form.Label>
-              {/* <Form.Control
-                id={"issuedToWarehouse"}
-                value={issuedToWarehouse}
-                onChange={handleInputChange}
-                disabled={!allowEdit}
-              /> */}
-              <Form.Select id={"issuedToWarehouse"} onChange={handleInputChange} disabled={!allowEdit} value={issuedToWarehouse}>
-                <option key={0} value={''}></option>
-                {
-                  warehousesList.map((warehouse: any, index: number) => (
-                    <option key={index+1} value={warehouse?.id}>{warehouse?.name}</option>
-                  ))
-                }
-              </Form.Select>              
-            </Form.Group>
-          </Col>
+          {
+            (orderType !== "purchase" && orderType !== "installation") && (
+              <Col md={4} className="mt-5">
+                <Form.Group controlId="issuedToWarehouse">
+                  <Form.Label>
+                    Issued To Warehouse
+                  </Form.Label>
+                  <Form.Select id={"issuedToWarehouse"} onChange={handleInputChange} disabled={!allowEdit || formType === "edit"} value={issuedToWarehouse}>
+                    <option key={0} value={''}></option>
+                    {
+                      warehousesList.map((warehouse: any, index: number) => (
+                        <option key={index + 1} value={warehouse?.id}>{warehouse?.name}</option>
+                      ))
+                    }
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            )
+          }
         </Row>
 
-        <Row className="mt-5">
-          <Col md={3}>
-            <Form.Group controlId="issuedForClientName">
-              <Form.Label>
-                Issued For Client Name
-              </Form.Label>
-              <Form.Control
-                id={"issuedForClientName"}
-                value={issuedForClientName}
-                onChange={handleInputChange}
-                disabled={!allowEdit}
-              />
-            </Form.Group>
-          </Col>
+        {
+          (orderType !== 'purchase' && orderType !== "stock_transfer") && (
+            <Row className="mt-5">
+              <Col md={3}>
+                <Form.Group controlId="issuedForClientName">
+                  <Form.Label>
+                    Issued For Client Name
+                  </Form.Label>
+                  <Form.Control
+                    id={"issuedForClientName"}
+                    value={issuedForClientName}
+                    onChange={handleInputChange}
+                    disabled={!allowEdit}
+                  />
+                </Form.Group>
+              </Col>
 
-          <Col md={3}>
-            <Form.Group controlId="issuedForClientAddress">
-              <Form.Label>
-                Issued For Client Address
-              </Form.Label>
-              <Form.Control
-                id={"issuedForClientAddr"}
-                value={issuedForClientAddr}
-                onChange={handleInputChange}
-                disabled={!allowEdit}
-              />
-            </Form.Group>
-          </Col>
+              <Col md={3}>
+                <Form.Group controlId="issuedForClientAddress">
+                  <Form.Label>
+                    Issued For Client Address
+                  </Form.Label>
+                  <Form.Control
+                    id={"issuedForClientAddr"}
+                    value={issuedForClientAddr}
+                    onChange={handleInputChange}
+                    disabled={!allowEdit}
+                  />
+                </Form.Group>
+              </Col>
 
-          <Col md={3}>
-            <Form.Group controlId="issuedForClientPincode">
-              <Form.Label>
-                Issued For Client Pincode
-              </Form.Label>
-              <Form.Control
-                id={"issuedForClientPincode"}
-                value={issuedForClientPincode}
-                onChange={handleInputChange}
-                disabled={!allowEdit}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+              <Col md={3}>
+                <Form.Group controlId="issuedForClientPincode">
+                  <Form.Label>
+                    Issued For Client Pincode
+                  </Form.Label>
+                  <Form.Control
+                    id={"issuedForClientPincode"}
+                    value={issuedForClientPincode}
+                    onChange={handleInputChange}
+                    disabled={!allowEdit}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          )
+        }
 
-        <Row className="mt-5">
-          <Col md={3}>
-            <Form.Group controlId="serviceReportNumber">
-              <Form.Label>
-                Service Report Number
-              </Form.Label>
-              <Form.Control
-                id={"serviceReportNumber"}
-                value={serviceReportNumber}
-                onChange={handleInputChange}
-                disabled={!allowEdit}
-              />
-            </Form.Group>
-          </Col>
+        {
+          (orderType !== 'purchase' && orderType !== "stock_transfer") && (
+            <Row className="mt-5">
+              <Col md={3}>
+                <Form.Group controlId="serviceReportNumber">
+                  <Form.Label>
+                    Service Report Number
+                  </Form.Label>
+                  <Form.Control
+                    id={"serviceReportNumber"}
+                    value={serviceReportNumber}
+                    onChange={handleInputChange}
+                    disabled={!allowEdit}
+                    required={(orderType === "return" && (orderStatus === "sent" || orderStatus === "recieved"))}
+                  />
+                </Form.Group>
+              </Col>
 
-          <Col md={3}>
-            <Form.Group controlId="delieveryChallanNumber">
-              <Form.Label>
-                Delievery Challan Number
-              </Form.Label>
-              <Form.Control
-                id={"delieveryChallanNumber"}
-                value={delieveryChallanNumber}
-                onChange={handleInputChange}
-                disabled={!allowEdit}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+              <Col md={3}>
+                <Form.Group controlId="delieveryChallanNumber">
+                  <Form.Label>
+                    Delievery Challan Number
+                  </Form.Label>
+                  <Form.Control
+                    id={"delieveryChallanNumber"}
+                    value={delieveryChallanNumber}
+                    onChange={handleInputChange}
+                    disabled={!allowEdit}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          )
+        }
 
-        <Row className="mt-5 mb-5">
-          <Col md={3}>
-            <Form.Group controlId="createdAt">
-              <Form.Label>
-                Order Created At
-              </Form.Label>
-              <Form.Control
-                id={"createdAt"}
-                value={createdAt}
-                onChange={handleInputChange}
-                disabled={true}
-              />
-            </Form.Group>
-          </Col>
+        {
+          formType === "edit" && (
+            <Row className="mt-5 mb-5">
+              <Col md={3}>
+                <Form.Group controlId="createdAt">
+                  <Form.Label>
+                    Order Created At
+                  </Form.Label>
+                  <Form.Control
+                    id={"createdAt"}
+                    value={createdAt}
+                    onChange={handleInputChange}
+                    disabled={true}
+                  />
+                </Form.Group>
+              </Col>
 
-          <Col md={3}>
-            <Form.Group controlId="sentAt">
-              <Form.Label>
-                Order Sent At
-              </Form.Label>
-              <Form.Control
-                id={"sentAt"}
-                value={sentAt}
-                onChange={handleInputChange}
-                disabled={true}
-              />
-            </Form.Group>
-          </Col>
+              <Col md={3}>
+                <Form.Group controlId="sentAt">
+                  <Form.Label>
+                    Order Sent At
+                  </Form.Label>
+                  <Form.Control
+                    id={"sentAt"}
+                    value={sentAt}
+                    onChange={handleInputChange}
+                    disabled={true}
+                  />
+                </Form.Group>
+              </Col>
 
-          <Col md={3}>
-            <Form.Group controlId="recievedAt">
-              <Form.Label>
-                Order Recieved At
-              </Form.Label>
-              <Form.Control
-                id={"recievedAt"}
-                value={recievedAt}
-                onChange={handleInputChange}
-                disabled={true}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
+              <Col md={3}>
+                <Form.Group controlId="recievedAt">
+                  <Form.Label>
+                    Order Recieved At
+                  </Form.Label>
+                  <Form.Control
+                    id={"recievedAt"}
+                    value={recievedAt}
+                    onChange={handleInputChange}
+                    disabled={true}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          )
+        }
       </Form>
 
     </>

@@ -43,3 +43,7 @@ export const selectAllWarehouses = () => {
 export const selectCurrentStocks = () => {
   return (state: RootState) => state.order.stocks
 }
+
+export const selectMyWarehouse = () => {
+  return (state: RootState) => state.order.myWarehouse
+}

@@ -92,13 +92,36 @@ export const orderStatusOptions: Array<Options> = [
   }
 ]
 
+export const productUnitOptions: Array<Options> = [
+  // {
+  //   label: "Packets",
+  //   value: "packets"
+  // },
+  // {
+  //   label: "Pieces",
+  //   value: "pieces"
+  // },
+  // {
+  //   label: "Bundles",
+  //   value: "bundles"
+  // },  
+  {
+    label: "Numbers",
+    value: "numbers"
+  },
+  {
+    label: "Meters",
+    value: "meters"
+  }
+]
+
 export type ProductCreateBody = {
   order_id?: string | number;
   product_id?: string | number;
   serial_number?: string;
   model_number?: string;
   quantity?: number;
-  unit?: number;
+  unit?: string;
 }
 
 export type OrderCreateBody = {
@@ -113,5 +136,6 @@ export type OrderCreateBody = {
   issued_for_client_address?: string;
   issued_for_client_pincode?: string;
   service_report_number?: string;
-  delievery_challan_number?: string;  
+  delievery_challan_number?: string;
+  parent_order_id?: number | string;
 }

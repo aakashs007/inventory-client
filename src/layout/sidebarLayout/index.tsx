@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { selectSideDrawerOpen } from '@/redux/selector/app';
 import { openSideDrawer } from '@/redux/actions/app';
 import { Typography } from '@mui/material';
+import { selectCurrentUserRole } from '@/redux/selector/user';
 
 const drawerWidth = 240;
 
@@ -36,6 +37,7 @@ export default function ResponsiveDrawer(props: Props) {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const dispatch = useAppDispatch();
   const sideDrawerOpen = useAppSelector(selectSideDrawerOpen());
+  const currentUserRole = useAppSelector(selectCurrentUserRole());
 
   const handleDrawerToggle = () => {
     dispatch(openSideDrawer(false));
@@ -47,27 +49,31 @@ export default function ResponsiveDrawer(props: Props) {
       <Divider />
       <List>
         {/* {['My Orders'].map((text, index) => ( */}
-          <ListItem key={'My Orders'} disablePadding>
-            <Link href={"/"} style={{textDecoration:"none", width: '100%', color: 'black' }}> 
+        <ListItem key={'My Orders'} disablePadding>
+          <Link href={"/"} style={{ textDecoration: "none", width: '100%', color: 'black' }}>
             <ListItemButton>
               <ListItemIcon>
                 <ShoppingCartIcon />
               </ListItemIcon>
               <ListItemText primary={'My Orders'} />
             </ListItemButton>
-            </Link>
-          </ListItem>
+          </Link>
+        </ListItem>
 
-          <ListItem key={'Create Order'} disablePadding>
-            <Link href={"/stock"} style={{textDecoration:"none", width: '100%', color: 'black' }}> 
-              <ListItemButton>
-                <ListItemIcon>
-                  <Inventory />
-                </ListItemIcon>
-                <ListItemText primary={'Warehouse Stocks'} />
-              </ListItemButton>
-            </Link>
-          </ListItem>          
+        {
+          (currentUserRole === "warehouse_admin" || currentUserRole === "warehouse_user") && (
+            <ListItem key={'Create Order'} disablePadding>
+              <Link href={"/stock"} style={{ textDecoration: "none", width: '100%', color: 'black' }}>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <Inventory />
+                  </ListItemIcon>
+                  <ListItemText primary={'My Warehouse'} />
+                </ListItemButton>
+              </Link>
+            </ListItem>
+          )
+        }
         {/* ))} */}
       </List>
       {/* <Divider /> */}
@@ -91,30 +97,30 @@ export default function ResponsiveDrawer(props: Props) {
 
   return (
     <>
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="mailbox folders"
-      >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Drawer
-          container={container}
-          variant="temporary"
-          open={sideDrawerOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            // display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-          }}
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <Box
+          component="nav"
+          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+          aria-label="mailbox folders"
         >
-          {drawer}
-        </Drawer>
-        {/* <Drawer
+          {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+          <Drawer
+            container={container}
+            variant="temporary"
+            open={sideDrawerOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+            sx={{
+              // display: { xs: 'block', sm: 'none' },
+              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            }}
+          >
+            {drawer}
+          </Drawer>
+          {/* <Drawer
           variant="permanent"
           sx={{
             display: { xs: 'none', sm: 'block' },
@@ -124,14 +130,14 @@ export default function ResponsiveDrawer(props: Props) {
         >
           {drawer}
         </Drawer> */}
+        </Box>
+        <Box
+          component="main"
+          sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        >
+          {children}
+        </Box>
       </Box>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
-      >
-        { children }
-      </Box>
-    </Box>
     </>
   );
 }

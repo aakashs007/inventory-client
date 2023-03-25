@@ -16,6 +16,7 @@ import { selectUserId, selectUserToken } from '@/redux/selector/user';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { updateSnackbar } from '@/redux/actions/app';
+import Image from 'next/image';
 
 function Copyright(props: any) {
   return (
@@ -75,9 +76,10 @@ export default function SignIn() {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
+          {/* <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}> */}
+            {/* <LockOutlinedIcon /> */}
+            <Image className='mb-4' src={"/ibox_logo.png"} width={100} height={50} alt={"iBox Logo"}/>
+          {/* </Avatar> */}
           <Typography component="h1" variant="h5">
             Sign In
           </Typography>

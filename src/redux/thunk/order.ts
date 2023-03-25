@@ -6,7 +6,7 @@ import { AnyAction } from "redux";
 import { ThunkAction } from "redux-thunk";
 import { RootState } from ".."
 import { updateSnackbar } from "../actions/app";
-import { setAddProduct, setAllOrders, setAllProducts, setCurrentOrder, setCurrentOrderProducts, setCurrentStocks, setUpdateProduct, setWarehouses } from "../actions/order";
+import { setAddProduct, setAllOrders, setAllProducts, setCurrentOrder, setCurrentOrderProducts, setCurrentStocks, setMyWarehouse, setUpdateProduct, setWarehouses } from "../actions/order";
 import { setUserInfo, setUserToken, userLoading } from "../actions/user";
 
 export const getOrders = (params?: Params) => {
@@ -215,6 +215,42 @@ export const fetchCurrentStocks = () => {
       dispatch(updateSnackbar({ type: 'error', message: 'Unable to fetch stocks!', open: true}))
     }
     
+    dispatch(userLoading({ loading : false }));
+  }
+}
+
+export const fetchMyWarehouse = () => {
+  return async(dispatch: Dispatch<AnyAction>, getState: () => RootState) => {
+    const apiEndPoint = new ApiEndpoints(process.env.reactHost || "", null);
+    apiEndPoint.setToken(getState().user.token);
+    dispatch(userLoading({ loading : true }));
+
+    const { success, response } = await apiEndPoint.get(`api/v1/my/warehouse`);
+
+    if(success && response?.data?.success) {
+      dispatch(setMyWarehouse(response?.data?.data))
+    } else {
+      dispatch(updateSnackbar({ type: 'error', message: 'Unable to fetch my warehouse!', open: true}))
+    }
+
+    dispatch(userLoading({ loading : false }));
+  }
+}
+
+export const cloneReturnOrderProducts = (returnOrderId: string) => {
+  return async(dispatch: Dispatch<AnyAction>, getState: () => RootState) => {
+    const apiEndPoint = new ApiEndpoints(process.env.reactHost || "", null);
+    apiEndPoint.setToken(getState().user.token);
+    dispatch(userLoading({ loading : true }));
+
+    const { success, response } = await apiEndPoint.put(`api/v1/clone/order_product/${returnOrderId}`, {});
+
+    if(success && response?.data?.success) {
+      dispatch(setCurrentOrderProducts(response?.data?.data))
+    } else {
+      dispatch(updateSnackbar({ type: 'error', message: 'Unable to clone order products!', open: true}))
+    }
+
     dispatch(userLoading({ loading : false }));
   }
 }

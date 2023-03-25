@@ -13,6 +13,7 @@ import { Options, orderPaymentModeOptions, orderStatusOptions, orderTransferType
 import { fetchOrderProducts, showOrder } from "@/redux/thunk/order";
 import ProductTable from "@/components/products/table";
 import AddEditOrder from "@/components/order/addEditForm";
+import Overlays from "@/components/overlays";
 
 export default function EditOrder(prop: any) {
   const router = useRouter()
@@ -30,6 +31,7 @@ export default function EditOrder(prop: any) {
   return (
     <>
       <CustomAppBar drawerWidth={0} />
+      <Overlays />
       <ResponsiveDrawer />
       <Container>
         <AddEditOrder />

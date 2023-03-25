@@ -23,7 +23,7 @@ export default function AddEditProduct(props: any) {
   const [serialNumber, setSerialNumber] = useState<string>();
   const [modelNumber, setModelNumber] = useState<string>();
   const [quantity, setQuanity] = useState<number>();
-  const [unit, setUnit] = useState<number>();
+  const [unit, setUnit] = useState<string>();
   const [orderId, setOrderId] = useState<string | undefined>();
   const [productOptions, setProductOptions] = useState([]);
   const [productId, setProductId] = useState<string>();
@@ -33,7 +33,7 @@ export default function AddEditProduct(props: any) {
   useEffect(() => {
     setProductOptions(allProducts.map((opt: any, index: number) => {
       return (
-        <option key={index} value={opt.id}>{`#${opt.id} `}{opt.name}</option>
+        <option key={index} value={opt.id}>{`#${opt.id} `}{opt.name}{` (in ${opt.unit})`}</option>
       )
     }))
 
@@ -147,7 +147,7 @@ export default function AddEditProduct(props: any) {
           </Col>
           <Col md={2} sm={1} xs={6}>
             {
-              formType === "edit" && currentOrderBelongsToUser(currentOrder, userId) && (
+              formType === "edit" && currentOrderBelongsToUser(currentOrder, userId) && (currentOrder.order_status === "created") && (
                 <Button variant="contained" color="secondary" type="submit">
                   Edit Product
                 </Button>                
@@ -260,7 +260,7 @@ export default function AddEditProduct(props: any) {
             </Form.Group>
           </Col>
 
-          <Col md={3}>
+          {/* <Col md={3}>
             <Form.Group controlId="unit">
               <Form.Label>
                 Unit
@@ -270,10 +270,9 @@ export default function AddEditProduct(props: any) {
                 id={"unit"}
                 value={unit}
                 onChange={handleInputChange}
-              // disabled={!allowEdit}
               />
             </Form.Group>
-          </Col>
+          </Col> */}
         </Row>
       </Form>
     </>

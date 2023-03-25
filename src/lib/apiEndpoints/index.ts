@@ -20,7 +20,7 @@ class ApiEndpoints {
   }
 
   async get(endPoint: string, params: Params = {}) {
-    const fullEndpoint = `http://${this.host}/${endPoint}`;
+    const fullEndpoint = `${process.env.protocol}://${this.host}/${endPoint}`;
 
     try {
       const response = await this.axios.get(fullEndpoint, {
@@ -35,7 +35,7 @@ class ApiEndpoints {
   }
 
   async post(endPoint: string, body: Object, params: Params = {}) {
-    const fullEndpoint = `http://${this.host}/${endPoint}`;
+    const fullEndpoint = `${process.env.protocol}://${this.host}/${endPoint}`;
 
     try {
       const response = await this.axios.post(fullEndpoint, body, {
@@ -49,7 +49,7 @@ class ApiEndpoints {
   }
 
   async delete(endPoint: string) {
-    const fullEndpoint = `http://${this.host}/${endPoint}`;
+    const fullEndpoint = `${process.env.protocol}://${this.host}/${endPoint}`;
 
     try {
       const response = await this.axios.delete(fullEndpoint);
@@ -61,7 +61,7 @@ class ApiEndpoints {
   }
 
   async put(endPoint: string, body: Object, params: Params = {}) {
-    const fullEndpoint = `http://${this.host}/${endPoint}`;
+    const fullEndpoint = `${process.env.protocol}://${this.host}/${endPoint}`;
 
     try {
       const response = await this.axios.put(fullEndpoint, body, {

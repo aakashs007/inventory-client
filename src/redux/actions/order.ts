@@ -9,7 +9,8 @@ export enum Order {
   SET_CURRENT_ORDER = "order/SET_CURRENT_ORDER",
   CREATE_ORDER = "order/CREATE_ORDER",
   SET_WAREHOUSE = "order/SET_WAREHOUSE",
-  SET_CURRENT_STOCKS = "order/SET_CURRENT_STOCKS"
+  SET_CURRENT_STOCKS = "order/SET_CURRENT_STOCKS",
+  SET_MY_WAREHOUSE = "order/SET_MY_WAREHOUSE",
 }
 
 export const setAllOrders = (payload: string) => {
@@ -54,4 +55,8 @@ export const setWarehouses = (payload: any) => {
 
 export const setCurrentStocks = (payload: any) => {
   return { type: Order.SET_CURRENT_STOCKS, payload };
+}
+
+export const setMyWarehouse = (payload: any) => {
+  return { type: Order.SET_MY_WAREHOUSE, payload };
 }

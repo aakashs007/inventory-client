@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    reactHost: "localhost:3000"
+    reactHost: "localhost:3000",
+    protocol: "http"
   }
 }
 

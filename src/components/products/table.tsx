@@ -29,13 +29,14 @@ import { Add } from '@mui/icons-material';
 import { selectCurrentOrder } from '@/redux/selector/order';
 import { selectUserId } from '@/redux/selector/user';
 import { currentOrderBelongsToUser } from '@/helpers/helperMethods';
+import { cloneReturnOrderProducts } from '@/redux/thunk/order';
 
 interface Data { // WarehouseAdmin Columns
   id: string;
   serialNumber: string;
   modelNumber: string;
   quantity: string;
-  unit: string;
+  // unit: string;
   productName: string;
   supplierEmail: string;
 }
@@ -116,12 +117,12 @@ const headCells: readonly HeadCell[] = [
     disablePadding: false,
     label: 'Quantity'
   },
-  {
-    id: 'unit',
-    numeric: false,
-    disablePadding: false,
-    label: 'Unit'    
-  },
+  // {
+  //   id: 'unit',
+  //   numeric: false,
+  //   disablePadding: false,
+  //   label: 'Unit'    
+  // },
   {
     id: 'productName',
     numeric: false,
@@ -216,6 +217,12 @@ export default function ProductTable(props: any) {
     router.push("/product/new");
   }
 
+  function cloneProducts() {
+    if(!currentOrder || !currentOrder?.id) return;
+
+    dispatch(cloneReturnOrderProducts(currentOrder?.id));
+  }
+
   function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     const { numSelected } = props;
   
@@ -250,7 +257,11 @@ export default function ProductTable(props: any) {
           </Typography>
         )}
         {
-          currentOrderBelongsToUser(currentOrder, userId) && (
+          (currentOrder && currentOrder?.status === "created" && currentOrder?.order_type === "return") &&
+          (<Button color='secondary' style={{marginRight: '10px'}} size='sm' id={'addProduct'} onClick={cloneProducts}>Clone Products</Button>)
+        }
+        {
+          currentOrderBelongsToUser(currentOrder, userId) && (currentOrder?.order_status === "created") && (
             <Button size='sm' id={'addProduct'} onClick={addProduct}>Add Product</Button>
           )
         }
@@ -278,8 +289,8 @@ export default function ProductTable(props: any) {
           id: product.id,
           serialNumber: product?.serial_number,
           modelNumber: product?.model_number,
-          quantity: product?.quantity,
-          unit: product?.unit,
+          quantity: `${product?.quantity} ${product?.product?.unit || ""}`,
+          // unit: product?.unit,
           productName: product?.product?.name,
           supplierEmail: product?.product?.supplier?.email          
         } as Data
@@ -431,7 +442,7 @@ export default function ProductTable(props: any) {
                       <TableCell align="center">{capitalize(row.serialNumber)}</TableCell>
                       <TableCell align="center">{row.modelNumber}</TableCell>
                       <TableCell align="center">{row.quantity}</TableCell>
-                      <TableCell align="center">{row.unit}</TableCell>
+                      {/* <TableCell align="center">{row.unit}</TableCell> */}
                       <TableCell align="center">{row.productName}</TableCell>
                       <TableCell align="center">{row.supplierEmail}</TableCell>
                     </TableRow>

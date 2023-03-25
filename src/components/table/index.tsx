@@ -293,6 +293,8 @@ export default function EnhancedTable(props: any) {
         return `${sentFromUser.email}(${sentFromUser.warehouse.name})(warehouse)`;
       } else if(sentFromUser.user_type === "supplier") {
         return `${sentFromUser.email}(supplier)`
+      } else if(sentFromUser.user_type === "site_engineer") {
+        return `${sentFromUser.email}(site_engineer)`
       }
     }
 

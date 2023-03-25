@@ -6,7 +6,8 @@ export const initialState = {
   allProducts: [],
   currentOrder: {},
   warehouses: [],
-  stocks: []
+  stocks: [],
+  myWarehouse: null
 };
 
 export const previousState = [];

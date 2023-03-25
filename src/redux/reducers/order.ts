@@ -72,6 +72,11 @@ export function orderReducer(state = initialState, action: any) {
       return Object.assign({}, state, { stocks: payload });
     }
 
+    case Order.SET_MY_WAREHOUSE: {
+      const payload = action.payload;      
+      return Object.assign({}, state, { myWarehouse: payload });
+    }
+
     default:
       return state
   }  

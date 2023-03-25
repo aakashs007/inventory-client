@@ -19,6 +19,7 @@ import { fetchAllProducts, fetchWarehouses, getOrders } from '@/redux/thunk/orde
 import { selectAllOrders } from '@/redux/selector/order'
 import { Container } from '@mui/system'
 import { fetchUserList } from '@/redux/thunk/user'
+import Overlays from '@/components/overlays'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -57,7 +58,8 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <Backdrop
+        <Overlays />
+        {/* <Backdrop
           sx={{ color: '#fff', zIndex: 2000 }}
           open={isLoading}
           // onClick={handleClose}
@@ -74,7 +76,7 @@ export default function Home() {
           <Alert severity={snackBarSelector?.type || "error"} sx={{ width: '100%' }} onClose={handleClose}>
             {snackBarSelector?.message || ""}
           </Alert>
-        </Snackbar>
+        </Snackbar> */}
 
         <CustomAppBar />
         <ResponsiveDrawer />
