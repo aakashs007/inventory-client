@@ -1,3 +1,4 @@
+import { User } from "@/models/user"
 import { RootState } from ".."
 
 export const selectUserInfo = () => {
@@ -27,7 +28,7 @@ export const selectUserEmail = () => {
 export const selectCurrentUserRole = () => {
   return (state: RootState) => {
     const userId = state.user.id;
-    const userInfo = state.user.userList.find((user: any) => user.id == userId);
+    const userInfo: User | undefined = state.user.userList.find((user: User) => user.id == userId);
 
     if(userInfo) {
       return userInfo.user_type
