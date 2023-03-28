@@ -147,7 +147,7 @@ export default function AddEditProduct(props: any) {
           </Col>
           <Col md={2} sm={1} xs={6}>
             {
-              formType === "edit" && currentOrderBelongsToUser(currentOrder, userId) && (currentOrder.order_status === "created") && (
+              formType === "edit" && currentOrderBelongsToUser(currentOrder, userId) && (currentOrder.status === "created") && (
                 <Button variant="contained" color="secondary" type="submit">
                   Edit Product
                 </Button>                

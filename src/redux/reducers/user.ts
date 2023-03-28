@@ -1,5 +1,6 @@
 import { User } from "../actions/user";
 import { initialState } from "../store/user";
+import { User as UserInterface} from "../../models/user";
 
 export function userReducer(state = initialState, action: any) {
   switch (action.type) {
@@ -23,7 +24,7 @@ export function userReducer(state = initialState, action: any) {
     }
 
     case User.SET_USER_LIST: {
-      const userList = action.payload;
+      const userList = action.payload as Array<UserInterface>;
       return Object.assign({}, state, { userList });
     }
 

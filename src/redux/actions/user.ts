@@ -5,6 +5,7 @@ export enum User {
   USER_LOGOUT = "user/USER_LOGOUT",
   SET_USER_LIST = "user/SET_USER_LIST"
 }
+import { User as UserInterface } from "../../models/user";
 
 export const userLoading = (payload: any) => {
   return { type: User.USER_AUTH_LOADING, payload }
@@ -22,6 +23,6 @@ export const logoutUser = () => {
   return { type: User.USER_LOGOUT }
 }
 
-export const setUserList = (payload: any) => {
+export const setUserList = (payload: Array<UserInterface>) => {
   return { type: User.SET_USER_LIST, payload }
 }

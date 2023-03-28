@@ -326,14 +326,14 @@ export default function AddEditOrder(props: any) {
           }
 
           {
-            (orderType !== "purchase" && orderType !== "stock_transfer" && orderType !== "installation" && orderType !== "return") && (
+            (formType === "edit") && (
               <>
                 <Col md={3} className="mt-5">
                   <Form.Group controlId="issuedFromWarehouse">
                     <Form.Label>
                       Issued From Warehouse
                     </Form.Label>
-                    <Form.Select id={"issuedFromWarehouse"} onChange={handleInputChange} disabled={!allowEdit || formType === "edit"} value={issuedFromWarehouse}>
+                    <Form.Select id={"issuedFromWarehouse"} onChange={handleInputChange} disabled={formType === "edit"} value={issuedFromWarehouse}>
                       <option key={0} value={''}></option>
                       {
                         warehousesList.map((warehouse: any, index: number) => (
@@ -370,7 +370,7 @@ export default function AddEditOrder(props: any) {
           }
 
           {
-            (orderType !== "purchase" && orderType !== "installation") && (
+            (orderType !== "purchase" && orderType !== "installation" && orderType !== "distribution_sale" && orderType !== "amc" && orderType !== "complaint") && (
               <Col md={4} className="mt-5">
                 <Form.Group controlId="issuedToWarehouse">
                   <Form.Label>

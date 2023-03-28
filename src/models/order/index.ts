@@ -17,22 +17,22 @@ export const OrderTypeOptions = [
     value: "stock_transfer",
     label: "Stock transfer",
   },
-  {
-    value: "replacement",
-    label: "Replacement",
-  },
+  // {
+  //   value: "replacement",
+  //   label: "Replacement",
+  // },
   {
     value: "return",
     label: "Return",
   },
-  {
-    value: "removed",
-    label: "Removed",
-  },
-  {
-    value: "repaired",
-    label: "Repaired",
-  },
+  // {
+  //   value: "removed",
+  //   label: "Removed",
+  // },
+  // {
+  //   value: "repaired",
+  //   label: "Repaired",
+  // },
   {
     value: "distribution_sale",
     label: "Distribution Sale",
@@ -129,9 +129,9 @@ export type OrderCreateBody = {
   transfer_type?: string;
   order_type?: string;
   payment_mode?: string;
-  sent_from_user_id?: string;
-  sent_to_user_id?: string;
-  issued_to_warehouse_id?: string;
+  sent_from_user_id?: string | number;
+  sent_to_user_id?: string | number;
+  issued_to_warehouse_id?: string | number;
   issued_for_client_name?: string;
   issued_for_client_address?: string;
   issued_for_client_pincode?: string;
