@@ -261,7 +261,7 @@ export default function ProductTable(props: any) {
           (<Button color='secondary' style={{marginRight: '10px'}} size='sm' id={'addProduct'} onClick={cloneProducts}>Clone Products</Button>)
         }
         {
-          currentOrderBelongsToUser(currentOrder, userId) && (currentOrder?.order_status === "created") && (
+          currentOrderBelongsToUser(currentOrder, userId) && (currentOrder?.status === "created") && (
             <Button size='sm' id={'addProduct'} onClick={addProduct}>Add Product</Button>
           )
         }
